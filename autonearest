@@ -1,0 +1,57 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local enemiesFolder = workspace:WaitForChild("Enemies")
+
+local autoFarmEnabled = true
+local teleportCooldown = 0.1
+local clickCooldown = 0.1
+local maxDistance = 500
+
+local function getNearestEnemy()
+    local nearestEnemy = nil
+    local shortestDistance = math.huge
+
+    for _, enemy in pairs(enemiesFolder:GetChildren()) do
+        if enemy:IsA("Model") then
+            local humanoid = enemy:FindFirstChild("Humanoid")
+            local enemyRoot = enemy:FindFirstChild("HumanoidRootPart")
+
+            if humanoid and enemyRoot and humanoid.Health > 0 then
+                local distance = (humanoidRootPart.Position - enemyRoot.Position).Magnitude
+                if distance < shortestDistance and distance <= maxDistance then
+                    shortestDistance = distance
+                    nearestEnemy = enemy
+                end
+            end
+        end
+    end
+    return nearestEnemy
+end
+
+local function setAutoFarm(enabled)
+    autoFarmEnabled = enabled
+    if enabled then
+        print("macaco banana maça")
+    else
+        print("macaco banana peira")
+    end
+end
+
+
+setAutoFarm(true)
+
+while true do
+    if autoFarmEnabled then
+        local nearestEnemy = getNearestEnemy()
+        if nearestEnemy then
+            humanoidRootPart.CFrame = nearestEnemy.HumanoidRootPart.CFrame * CFrame.new(0, 0, 2)
+            wait(teleportCooldown)
+        else
+            print("1")
+            wait(1)
+        end
+    else
+        wait(1)
+    end
+end
